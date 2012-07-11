@@ -39,6 +39,8 @@ def user():
 
 @auth.requires_login()
 def search():
+    if db(db.logins).count() == 0:
+        redirect(URL('index'))
     form = SQLFORM.factory(Field('name'),Field('start_time','datetime'),Field('end_time','datetime'),Field('type'))
     if form.process().accepted:
         #we don't want blank entries
@@ -63,6 +65,8 @@ def search():
     
 @auth.requires_login()
 def result():
+    if db(db.logins).count() == 0:
+        redirect(URL('index'))
     if session.gridvars is not None:
         return dict(grid=rowTable(makeQuery()))
     else:
