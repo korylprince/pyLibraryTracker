@@ -23,6 +23,8 @@ To use Active Directory with allowed groups, currently web2py must be patched.
 Please see http://www.web2pyslices.com/slice/show/1493/active-directory-ldap-with-allowed-groups on how to set that up.
 This issue has been fixed in a new development version of web2py.
 
+Requires python-ldap module.
+
 If you have any issues or questions, email the email address below, or open an issue at:
 https://github.com/korylprince/pyLibraryTracker/issues
 
