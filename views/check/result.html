@@ -1,0 +1,96 @@
+{{extend 'layout.html'}}
+<h4>Searching For:</h4>
+{{
+def sorter(a):
+    return {'end_time':1,'start_time':2,'name':3,'type':4}[a]
+}}
+{{for k,w in sorted(session.gridvars.items(), key=lambda x: sorter(x[0])):}}
+<div><strong>{{
+if k == 'name':
+    response.write('Name contains')
+elif k == 'type':
+    response.write('Type contains')
+elif k == 'end_time':
+    response.write('Before')
+elif k == 'start_time':
+    response.write('After')
+pass
+}}:</strong> {{
+if isinstance(w,datetime.datetime):
+    response.write(formatTime(w))
+else:
+    response.write(w)
+pass
+}}</div>
+{{pass}}
+<br />
+<div id=chart></div>
+<br />
+{{=grid}}
+
+
+<style type="text/css">
+.web2py_table {
+    border: 1px solid #ddd;
+    border-right: none;
+}
+.web2py_grid {
+    border: 1px solid #bbb;
+}
+tbody tr {
+    height: 30px;
+    border-top: 1px solid #ddd;
+}
+tbody td {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+</style>
+{{strlist = []
+from time import mktime
+datelist = [x.date for x in db(makeQuery()).select(db.logins.date)]
+datemin = int(mktime(min(datelist).timetuple())*1000-1000*60*60)#add hour to start
+datemax = int(mktime(max(datelist).timetuple())*1000+1000*60*60)#add hour to end
+for row in db(makeQuery()).select():
+    strlist.append('["'+str(row.date)+'","'+str(row.date).split(' ')[1])
+    strlist.append('","'+row.name+'"],')
+pass
+}}
+<script type='text/javascript'>
+$(document).ready(function(){
+ var line=[{{response.write(''.join(strlist)[:-1],escape=False)}}];
+ console.log(line);
+  var plot1 = $.jqplot('chart', [line], {
+      title:'Statistics',
+      series:[
+      {showLine:false}],
+      axes:{
+        xaxis:{
+          renderer:$.jqplot.DateAxisRenderer,
+          tickOptions:{
+            formatString:'%b&nbsp;%#d,&nbsp;%I:%M&nbsp;%p'
+          },
+          min: {{=datemin}},
+          max: {{=datemax}}
+        },
+        yaxis:{
+          renderer:$.jqplot.DateAxisRenderer,
+          tickOptions:{
+            formatString:'%I:%M&nbsp;%p'
+          },
+          tickInterval: '2 hours',
+          min: '0:00',
+          max: '24:00'
+        }
+      },
+      highlighter: {
+        show: true,
+        tooltipAxes: 'xy',
+        yvalues:2,
+        useAxesFormatters: false,
+formatString:'<span style="display: none;">%s%s</span><table class="jqplot-highlighter">\
+        <tr><td></td><td>%s</td></tr></table>' 
+      }
+  });
+});
+</script>
