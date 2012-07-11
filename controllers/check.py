@@ -22,7 +22,11 @@ response.title = "Library Logins"
 @auth.requires_login()
 def index():
     #get last id then select 10 before
-    lastid = db(db.logins).select().last().id
+    try:
+        lastid = db(db.logins).select().last().id
+    except AttributeError:
+        # no logins yet                                                                                                                      
+        return dict(form=DIV("No Records"))
     query = db.logins.id > lastid-10
     form = rowTable(query)
     return dict(form=form)
