@@ -49,8 +49,12 @@ tbody td {
 {{strlist = []
 from time import mktime
 datelist = [x.date for x in db(makeQuery()).select(db.logins.date)]
+#create daterange with padding
 datemin = int(mktime(min(datelist).timetuple())*1000)
 datemax = int(mktime(max(datelist).timetuple())*1000)
+diff = (datemax-datemin)/16
+datemin -= diff
+datemax += diff
 for row in db(makeQuery()).select():
     strlist.append('["'+str(row.date)+'","'+str(row.date).split(' ')[1])
     strlist.append('","'+row.name+'"],')
